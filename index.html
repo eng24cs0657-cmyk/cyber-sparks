@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Graph Adaptive Learning</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+  <script src="https://unpkg.com/force-graph"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Login Page -->
+  <div id="loginPage" class="login-page">
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <h1 class="login-title">🧠 Adaptive Learning</h1>
+          <p class="login-subtitle">Personalized Knowledge Graphs & Smart Learning</p>
+        </div>
+        <form class="login-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="loginName">Full Name</label>
+            <input type="text" id="loginName" placeholder="Enter your name" required>
+          </div>
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" placeholder="your.email@example.com" required>
+          </div>
+          <button type="submit" class="btn-login">Start Learning 🚀</button>
+        </form>
+        <p class="login-footer">No registration needed. Just enter your details to begin.</p>
+      </div>
+      <div class="login-features">
+        <h3>What You'll Get</h3>
+        <div class="feature-list">
+          <div class="feature-item">📊 Knowledge Graph Visualizations</div>
+          <div class="feature-item">🚀 Smart Learning Paths</div>
+          <div class="feature-item">📈 Progress Tracking & Analytics</div>
+          <div class="feature-item">🎯 Adaptive Difficulty Levels</div>
+          <div class="feature-item">🎥 YouTube Resource Links</div>
+          <div class="feature-item">🏆 Achievement Badges & Streaks</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application -->
+  <div id="mainApp" class="main-app" style="display: none;">
+    <div class="container">
+      <div class="header-bar">
+        <h1>Knowledge Graph Driven Adaptive Learning 🧠</h1>
+        <div class="user-menu">
+          <span id="userGreeting" class="user-greeting">Welcome!</span>
+          <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+      </div>
+      <p class="subtitle">AI-Powered Personalized learning paths - Just enter what you want to learn!</p>
+
+      <!-- Dashboard Overview -->
+      <div class="dashboard-grid">
+        <div class="stat-card" id="cardProgress">
+          <div class="stat-value" id="cardProgressValue">0%</div>
+          <div class="stat-label">Overall Progress</div>
+        </div>
+        <div class="stat-card" id="cardMastered">
+          <div class="stat-value" id="cardMasteredValue">0</div>
+          <div class="stat-label">Mastered Concepts</div>
+        </div>
+        <div class="stat-card" id="cardGaps">
+          <div class="stat-value" id="cardGapsValue">0</div>
+          <div class="stat-label">Open Gaps</div>
+        </div>
+        <div class="stat-card" id="cardNext">
+          <div class="stat-value" id="cardNextValue">—</div>
+          <div class="stat-label">Next Recommended</div>
+        </div>
+        <div class="stat-card" id="cardStreak">
+          <div class="stat-value" id="cardStreakValue">0🔥</div>
+          <div class="stat-label">Study Streak</div>
+        </div>
+      </div>
+
+      <!-- Gamification Badges -->
+      <div style="margin-top: 16px; text-align: center;">
+        <div id="badgesDisplay"></div>
+      </div>
+
+      <!-- Simplified Topic Input Panel -->
+      <div class="panel topic-input-panel">
+        <h2 class="topic-heading">📚 What would you like to learn?</h2>
+        <div class="topic-input-grid">
+          <div style="flex: 1;">
+            <input type="text" id="subject"
+              placeholder="e.g., Division, Fractions, Trigonometry, Photosynthesis, Python Functions..."
+              onkeypress="if(event.key === 'Enter') generateLearningPath()">
+          </div>
+          <button class="btn-primary" onclick="generateLearningPath()">Generate My Learning Path 🚀</button>
+        </div>
+        <p id="loadingStatus" class="loading-status"></p>
+
+        <!-- Quick Start Suggestions -->
+        <div class="quick-topics">
+          <span class="qt-label">🔥 Popular Now:</span>
+          <button class="qt-btn"
+            onclick="document.getElementById('subject').value='Machine Learning'; generateLearningPath()">🤖 Machine
+            Learning</button>
+          <button class="qt-btn"
+            onclick="document.getElementById('subject').value='Startups'; generateLearningPath()">🚀 Startups</button>
+          <button class="qt-btn"
+            onclick="document.getElementById('subject').value='Ancient Rome'; generateLearningPath()">🏛️ Ancient
+            Rome</button>
+          <button class="qt-btn"
+            onclick="document.getElementById('subject').value='Calculus'; generateLearningPath()">b³ Calculus</button>
+          <button class="qt-btn"
+            onclick="document.getElementById('subject').value='Photography'; generateLearningPath()">📷
+            Photography</button>
+        </div>
+      </div>
+
+      <!-- Smart Personalization Hub -->
+      <div id="personalizationPanel" class="panel personalization-hub" style="display: none;">
+        <div class="hub-header">
+          <div class="hub-title-group">
+            <span class="hub-icon">✨</span>
+            <div class="hub-text">
+              <h2 id="hubTitle">Personalized Learning Hub</h2>
+              <p id="hubSubtitle">Analyzing your mastery and tailoring your path...</p>
+            </div>
+          </div>
+          <div id="hubStatusBadge" class="hub-badge">Adaptive Level: Beginner</div>
+        </div>
+
+        <div class="hub-content">
+          <div class="hub-stats-row">
+            <div class="hub-stat-item">
+              <span class="hub-stat-val" id="hubMastery">0%</span>
+              <span class="hub-stat-lbl">Mastery</span>
+            </div>
+            <div class="hub-stat-item">
+              <span class="hub-stat-val" id="hubConsistency">Low</span>
+              <span class="hub-stat-lbl">Consistency</span>
+            </div>
+            <div class="hub-stat-item">
+              <span class="hub-stat-val" id="hubPace">Steady</span>
+              <span class="hub-stat-lbl">Pace</span>
+            </div>
+          </div>
+
+          <div id="hubQuizContainer" class="hub-quiz-section">
+            <div class="quiz-placeholder">
+              <p>Ready for your personalized mastery check?</p>
+              <button class="btn-primary btn-glow" onclick="refreshPersonalizedQuiz()">Start Smart Quiz</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prerequisites Suggestion Panel -->
+      <div class="panel prerequisites-panel" id="prerequisitesPanel" style="display:none;">
+        <h2>📖 What You Should Learn First</h2>
+        <div id="prerequisitesContent"></div>
+      </div>
+
+      <!-- YouTube Resources Panel -->
+      <div class="panel full-width" id="youtubePanel" style="display:none;">
+        <h2>🎥 YouTube Learning Resources</h2>
+        <div class="youtube-grid" id="youtubeContent"></div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="main-grid">
+        <!-- Left Panel: Knowledge Graph -->
+        <div class="panel">
+          <h2>📊 Knowledge Graph</h2>
+          <div id="knowledgeGraph" class="graph-container"></div>
+          <div class="graph-controls">
+            <button class="btn-secondary btn-sm" onclick="resetGraphLayout()">Reset Layout</button>
+            <button class="btn-secondary btn-sm" onclick="expandGraph()">Fullscreen</button>
+          </div>
+        </div>
+
+        <!-- Right Panel: Assessment & Learning Path -->
+        <div class="panel">
+          <h2>🎯 Assessment & Progress</h2>
+
+          <!-- Assessment Section -->
+          <div class="assessment-section" id="quizContainer">
+            <h3>Curated Topics</h3>
+            <div id="assessmentQuestions" class="assessment-questions">
+              <div class="placeholder-container"
+                style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                <div style="font-size: 4rem; margin-bottom: 10px;">👋</div>
+                <h3 style="margin: 0; color: var(--text-primary);">Ready to Learn?</h3>
+                <p>Type a topic above or pick a quick suggestion to start your journey!</p>
+              </div>
+            </div>
+            <button class="btn-primary" id="analyzeGapsBtn" onclick="submitAssessment()" style="display:none;">Analyze
+              Gaps & Generate Path</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Static Learning Path (New Section) -->
+      <div class="panel full-width">
+        <h2>🚀 Adaptive Learning Path</h2>
+        <div id="learningPathGraph" class="static-path-container"></div>
+        <div id="learningPathLegend" class="path-legend">
+          <span class="legend-item"><span class="dot completed"></span> Completed</span>
+          <span class="legend-item"><span class="dot current"></span> Current</span>
+          <span class="legend-item"><span class="dot locked"></span> Locked</span>
+        </div>
+        <div id="learningPath" class="learning-path-details"></div>
+      </div>
+
+      <!-- Gap Analysis Visualization -->
+      <div class="panel full-width">
+        <h2>Gap Analysis & Diagnostic Report</h2>
+        <div class="gap-analysis-grid">
+          <div>
+            <h3>Understanding Gaps</h3>
+            <canvas id="gapChart"></canvas>
+          </div>
+          <div>
+            <h3>Prerequisite Dependencies</h3>
+            <div id="gapDetails"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics -->
+      <div class="panel full-width">
+        <h2>Performance Metrics</h2>
+        <canvas id="performanceChart"></canvas>
+      </div>
+
+      <!-- Progress Timeline -->
+      <div class="panel full-width">
+        <h2>📈 Learning Progress Timeline</h2>
+        <canvas id="progressTimelineChart"></canvas>
+      </div>
+
+      <!-- Mastery Progression -->
+      <div class="panel full-width">
+        <h2>🏆 Concept Mastery Progression</h2>
+        <canvas id="masteryChart"></canvas>
+      </div>
+
+      <!-- New Advanced Analytics Charts -->
+      <div class="panel full-width">
+        <h2>📊 Advanced Analytics Dashboard</h2>
+        <div class="charts-grid">
+          <div class="chart-container">
+            <h3>📈 Learning Velocity</h3>
+            <canvas id="velocityChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>🎯 Topic Difficulty Map</h3>
+            <canvas id="difficultyChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time & Progress Analysis -->
+      <div class="panel full-width">
+        <h2>⏱️ Time Investment Analysis</h2>
+        <div class="charts-grid">
+          <div class="chart-container">
+            <h3>⏰ Study Time Distribution</h3>
+            <canvas id="timeDistributionChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>📊 Skill Level Progression</h3>
+            <canvas id="skillLevelChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparative Analysis -->
+      <div class="panel full-width">
+        <h2>🔍 Comparative Learning Analysis</h2>
+        <canvas id="comparativeChart"></canvas>
+      </div>
+
+      <!-- Complete Learning Module Panel -->
+      <div class="panel full-width" id="completeLearningSection" style="display:none;">
+        <h2>📚 Complete Learning Module</h2>
+
+        <!-- Basics Section -->
+        <div class="learning-module-section">
+          <h3>🎯 Topic Basics</h3>
+          <div id="basicsContainer" class="basics-grid"></div>
+        </div>
+
+        <!-- Flowchart Section -->
+        <div class="learning-module-section">
+          <h3>📊 Learning Flowchart</h3>
+          <div id="flowchartContainer" class="flowchart-container"></div>
+        </div>
+
+        <!-- Concept Map Section -->
+        <div class="learning-module-section">
+          <h3>🧠 Concept Map</h3>
+          <div id="conceptMapContainer" class="concept-map-grid"></div>
+        </div>
+
+        <!-- YouTube Topics Section -->
+        <div class="learning-module-section">
+          <h3>🎬 YouTube Learning Resources</h3>
+          <div id="youtubeTopicsContainer" class="youtube-topics-grid"></div>
+        </div>
+
+        <!-- Guided Assignments & Important Topics Section -->
+        <div class="learning-module-section">
+          <h3>📝 Guided Assignments & Important Topics</h3>
+          <div id="aiAssignments"></div>
+        </div>
+
+        <!-- Recap Timetable Section -->
+        <div class="learning-module-section">
+          <h3>📅 Weekly Recap Timetable</h3>
+          <div id="recapTimetableContainer" class="recap-timetable-grid"></div>
+        </div>
+
+        <!-- Module Quiz Section -->
+        <div class="learning-module-section">
+          <h3>❓ Module Quiz</h3>
+          <div id="moduleQuizContainer"></div>
+        </div>
+      </div>
+
+      <!-- Study Plan Timeline -->
+      <div class="panel full-width" id="studyPlanSection" style="display:none;">
+        <h2>📅 Your Personalized Study Plan</h2>
+        <div id="planContainer" class="plan-container">
+          <div id="planSummary" class="plan-summary">
+            <div class="summary-card">
+              <span class="summary-label">Total Duration</span>
+              <span id="planDuration" class="summary-value">4 weeks</span>
+            </div>
+            <div class="summary-card">
+              <span class="summary-label">Daily Study Time</span>
+              <span id="planStudyTime" class="summary-value">2-3 hours</span>
+            </div>
+            <div class="summary-card">
+              <span class="summary-label">Total Phases</span>
+              <span id="planPhases" class="summary-value">3</span>
+            </div>
+          </div>
+
+          <!-- Phases Timeline -->
+          <div class="phases-timeline">
+            <h3>Study Phases</h3>
+            <div id="phasesContainer" class="phases-list"></div>
+          </div>
+
+          <!-- Milestones -->
+          <div class="milestones-section">
+            <h3>🎯 Milestones</h3>
+            <div id="milestonesContainer" class="milestones-list"></div>
+          </div>
+
+          <!-- Daily Schedule -->
+          <div class="daily-schedule-section">
+            <h3>📅 Weekly Schedule Sample</h3>
+            <div id="scheduleContainer" class="schedule-grid"></div>
+          </div>
+
+          <!-- Study Tips -->
+          <div class="study-tips-section">
+            <h3>💡 Pro Study Tips</h3>
+            <ul id="tipsContainer" class="tips-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Control Panel -->
+      <div class="panel full-width control-panel">
+        <h3>System Controls</h3>
+        <button class="btn-secondary" onclick="resetAssessment()">Reset Assessment</button>
+        <button class="btn-secondary" onclick="exportReport()">Export Learning Plan</button>
+        <button class="btn-secondary" onclick="toggleGraphView()">Toggle Graph View</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Initialize app on page load
+    document.addEventListener('DOMContentLoaded', function () {
+      // Check if user already logged in
+      const userName = localStorage.getItem('userName');
+      const userEmail = localStorage.getItem('userEmail');
+
+      if (userName && userEmail) {
+        showMainApp();
+      }
+    });
+
+    function handleLogin(event) {
+      event.preventDefault();
+      const name = document.getElementById('loginName').value.trim();
+      const email = document.getElementById('loginEmail').value.trim();
+
+      if (name && email) {
+        localStorage.setItem('userName', name);
+        localStorage.setItem('userEmail', email);
+        showMainApp();
+      }
+    }
+
+    function showMainApp() {
+      const userName = localStorage.getItem('userName');
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
+
+      // Set user greeting
+      const greeting = document.getElementById('userGreeting');
+      if (greeting && userName) {
+        greeting.textContent = 'Welcome, ' + userName + '!';
+      }
+
+      // Initialize charts after UI is visible
+      setTimeout(function () {
+        if (typeof initializeCharts === 'function') {
+          try {
+            initializeCharts();
+          } catch (e) {
+            console.log('Charts will be initialized on first use');
+          }
+        }
+        // Initialize Welcome Graph
+        if (window.initDashboardVisuals) window.initDashboardVisuals();
+      }, 500);
+    }
+
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+        document.getElementById('loginPage').style.display = 'block';
+        document.getElementById('mainApp').style.display = 'none';
+        location.reload();
+      }
+    }
+  </script>
+</body>
+
+</html>
